@@ -1,0 +1,40 @@
+{
+  "features": [
+    "Latitude",
+    "Longitude",
+    "MedInc"
+  ],
+  "random_state": 42,
+  "test_size": 0.2,
+  "kmeans": {
+    "n_clusters": 6,
+    "random_state": 42,
+    "n_init": 10
+  },
+  "classifier": {
+    "type": "LogisticRegression",
+    "C": 1.0,
+    "max_iter": 2000,
+    "solver": "lbfgs",
+    "random_state": 42
+  },
+  "scaler": "StandardScaler ajustado exclusivamente con train en cada pipeline",
+  "silhouette": {
+    "sample_size": 2000,
+    "random_state": 42,
+    "partition": "train"
+  },
+  "source": "/workspaces/campivargas07-Tutorial-K-Medias-machine-learning-python-template/housing.csv",
+  "source_sha256": "0e4a0bc8b337d88c95259a8ec05a58c662f26f87487f9cbf2448fe93207bcb5c",
+  "row_id": "posición original del CSV, basada en cero; estable mientras no cambie el archivo",
+  "python": "3.13.16",
+  "threads": 1,
+  "versions": {
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0",
+    "matplotlib": "3.11.2",
+    "threadpoolctl": "3.7.0"
+  }
+}

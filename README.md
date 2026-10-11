@@ -110,3 +110,40 @@ To process data, you can modify the app.py script to include your data processin
 This template was built as part of the [Data Science and Machine Learning Bootcamp](https://4geeksacademy.com/us/coding-bootcamps/datascience-machine-learning) by 4Geeks Academy by [Alejandro Sanchez](https://twitter.com/alesanchezr) and many other contributors. Learn more about [4Geeks Academy BootCamp programs](https://4geeksacademy.com/us/programs) here.
 
 Other templates and resources like this can be found on the school's GitHub page.
+
+## Experimento California Housing completado
+
+Para revisar la entrega y el recorrido del trabajo, consultar [el resumen del proyecto](RESUMEN_PROYECTO.md).
+
+El análisis en español y sus salidas están en `src/explore.ipynb`. Se utiliza el `housing.csv` local (20.640 grupos de bloques censales de 1990), exclusivamente con `Latitude`, `Longitude` y `MedInc`. Este último es ingreso mediano en aproximadamente 10.000 USD de 1990; véanse la [descripción de scikit-learn](https://github.com/scikit-learn/scikit-learn/blob/main/sklearn/datasets/descr/california_housing.rst) y la [aclaración publicada por O'Reilly](https://www.oreilly.com/catalog/errata.csp?isbn=0636920052289). No se requiere base de datos para este experimento.
+
+Se conservan las 20.640 filas; no hay nulos, no finitos ni duplicados completos. Cinco coincidencias en las características se conservan. No se renombran columnas. `row_id` identifica la posición original, basada en cero; el SHA-256 del CSV queda registrado. Train/test son 16.512/4.128 filas (80/20, semilla 42). Ambos StandardScaler se ajustan solo con train. K-Means usa seis clusters, semilla 42 y `n_init=10`. La regresión logística multinomial usa C=1 sin ajustes sobre test.
+
+Resultados: accuracy **0,987888**, F1 macro **0,979953**, **50** desacuerdos en test; inercia train **8069,187859** y silhouette **0,400446** sobre 2.000 filas de train (semilla 42). Las métricas supervisadas evalúan imitación de K-Means; no validan categorías reales ni predicen precios. La distancia sobre coordenadas escaladas no equivale a kilómetros y la partición aleatoria no evalúa extrapolación espacial o temporal.
+
+Archivos reproducibles:
+
+- `src/housing_workflow.py`: carga, auditoría, entrenamiento, exportación y predicción.
+- `src/app.py`: CLI para entrenar o cargar y predecir.
+- `src/verify.py`: comprobación independiente de artefactos existentes.
+- `models/kmeans_pipeline.joblib` y `models/classifier_pipeline.joblib`: procesamiento y estimador juntos.
+- `models/metrics.json`, `config.json`, `audit.json`, `verification.json`: resultados, parámetros, versiones y comprobaciones.
+- `data/processed/housing_clusters.csv`: tres variables, `row_id`, partición, cluster y predicción del clasificador.
+- `data/processed/centroids.csv`: centroides en unidades originales.
+
+Ejecutar desde la raíz, con Python 3.13 (versión usada: 3.13.16; las versiones del intérprete y paquetes constan en `models/config.json`):
+
+```bash
+python -m pip install -r requirements.txt
+python src/app.py train
+python src/verify.py
+python -m nbconvert --to notebook --execute --inplace src/explore.ipynb --ExecutePreprocessor.timeout=180
+```
+
+Para predecir nuevos registros, crear un CSV con encabezado `Latitude,Longitude,MedInc` y valores numéricos finitos, por ejemplo `34.05,-118.25,3.5`, y ejecutar:
+
+```bash
+python src/app.py predict --input nuevos.csv --output predicciones.csv
+```
+
+La predicción carga los modelos existentes sin entrenarlos. Los IDs de cluster son categorías arbitrarias asociadas al modelo guardado; no tienen orden y pueden cambiar al reentrenar. El nuevo CSV conserva el orden de entrada. El entrenamiento y la ejecución del notebook regeneran los artefactos del experimento. `verify.py` comprueba hash de origen, particiones sin solapamiento, conservación y alineación de filas, etiquetas enteras 0–5 y concordancia entre exportación y modelos recargados. Durante el entrenamiento también se comprueba igualdad de todas las predicciones antes y después de guardar. Cargar únicamente archivos joblib de confianza.

@@ -1,0 +1,8 @@
+{
+  "partitions_disjoint": true,
+  "rows_conserved": true,
+  "labels_valid": true,
+  "csv_aligned": true,
+  "reload_predictions_equal": true,
+  "scaler_train_only": true
+}
